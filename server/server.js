@@ -1,22 +1,23 @@
 import express from 'express';
 import http from 'http';
+import dotenv from 'dotenv';
+import { connectDB } from './config/db.js';
 import { Server } from 'socket.io';
-import { socketHandler } from './utils/socket.js'; // ✅ import handler
+import { socketHandler } from './utils/socket.js';
+
+dotenv.config();
+connectDB();
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: '*', // adjust in production
+    origin: '*', // Change to frontend URL later
   },
 });
 
-// ✅ Initialize sockets
 socketHandler(io);
-
-// Other Express app setup (middlewares, routes...)
 
 server.listen(process.env.PORT || 5000, () => {
   console.log(`🚀 Server running on port ${process.env.PORT || 5000}`);
 });
-
