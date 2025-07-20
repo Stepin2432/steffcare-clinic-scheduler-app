@@ -1,54 +1,48 @@
-import { createContext, useContext, useEffect, useState } from 'react';
-import { loginUser, logoutUser } from '../services/authService';
+import { createContext, useContext, useState, useEffect } from 'react';
+import axios from 'axios';
 
-// Create context
 const AuthContext = createContext();
 
-// Auth Provider component
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
-    const storedUser = localStorage.getItem('user');
-    return storedUser ? JSON.parse(storedUser) : null;
-  });
-
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(localStorage.getItem('token'));
 
   useEffect(() => {
-    setLoading(false); // Loading ends once localStorage is checked
-  }, []);
-
-  // Handle login
-  const login = async (credentials) => {
-    try {
-      const data = await loginUser(credentials);
-      setUser(data.user);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      localStorage.setItem('token', data.token);
-      return data.user;
-    } catch (error) {
-      throw error;
+    if (token) {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     }
+  }, [token]);
+
+  const login = async (email, password) => {
+    const res = await axios.post('/api/auth/login', { email, password });
+    setUser(res.data.user);
+    setToken(res.data.token);
+    localStorage.setItem('token', res.data.token);
   };
 
-  // Handle logout
-  const logout = async () => {
-    try {
-      await logoutUser();
-    } catch (error) {
-      console.error('Logout failed:', error.message);
-    } finally {
-      localStorage.removeItem('user');
-      localStorage.removeItem('token');
-      setUser(null);
-    }
+  const register = async (name, email, password, role) => {
+    const res = await axios.post('/api/auth/register', {
+      name,
+      email,
+      password,
+      role,
+    });
+    setUser(res.data.user);
+    setToken(res.data.token);
+    localStorage.setItem('token', res.data.token);
+  };
+
+  const logout = () => {
+    setUser(null);
+    setToken(null);
+    localStorage.removeItem('token');
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, token, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-// Custom hook to use auth context
 export const useAuth = () => useContext(AuthContext);

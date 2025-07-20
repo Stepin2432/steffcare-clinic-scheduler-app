@@ -1,25 +1,42 @@
 // client/src/App.jsx
-import { Routes, Route } from 'react-router-dom';
 
-import Home from './pages/Home';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import ProtectedRoute from './components/routes/ProtectedRoute';
+
 import Login from './pages/Login';
 import Register from './pages/Register';
-import Dashboard from './pages/Dashboard';
-import Appointments from './pages/Appointments';
-import Prescriptions from './pages/Prescriptions';
-import Rooms from './pages/Rooms';
+
+import AdminDashboard from './pages/admin/AdminDashboard';
+import ReceptionDashboard from './pages/reception/ReceptionDashboard';
+import DoctorDashboard from './pages/doctor/DoctorDashboard';
+import PatientDashboard from './pages/patient/PatientDashboard';
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/appointments" element={<Appointments />} />
-      <Route path="/prescriptions" element={<Prescriptions />} />
-      <Route path="/rooms" element={<Rooms />} />
-    </Routes>
+    <Router>
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+
+        {/* Protected Routes by Role */}
+        <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+          <Route path="/admin/*" element={<AdminDashboard />} />
+        </Route>
+
+        <Route element={<ProtectedRoute allowedRoles={['receptionist']} />}>
+          <Route path="/reception/*" element={<ReceptionDashboard />} />
+        </Route>
+
+        <Route element={<ProtectedRoute allowedRoles={['doctor']} />}>
+          <Route path="/doctor/*" element={<DoctorDashboard />} />
+        </Route>
+
+        <Route element={<ProtectedRoute allowedRoles={['patient']} />}>
+          <Route path="/patient/*" element={<PatientDashboard />} />
+        </Route>
+      </Routes>
+    </Router>
   );
 }
 
