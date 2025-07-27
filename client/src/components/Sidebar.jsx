@@ -1,25 +1,44 @@
-import { Link, useLocation } from 'react-router-dom';
+// src/components/Sidebar.jsx
+import { NavLink } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { getSidebarLinks } from '../data/sidebarLinks';
 
-const Sidebar = ({ links }) => {
-  const location = useLocation();
+const Sidebar = () => {
+  const { user, logout } = useAuth();
+  const links = getSidebarLinks(user?.role);
 
   return (
-    <aside className="w-64 bg-white shadow-md h-full p-4">
-      <h2 className="text-xl font-bold mb-4">Steffcare Medclinic</h2>
-      <ul className="space-y-2">
-        {links.map(link => (
-          <li key={link.path}>
-            <Link
-              to={link.path}
-              className={`block px-3 py-2 rounded ${
-                location.pathname === link.path ? 'bg-blue-500 text-white' : 'text-gray-800 hover:bg-blue-100'
-              }`}
-            >
-              {link.label}
-            </Link>
-          </li>
+    <aside className="w-64 bg-white h-screen shadow-md flex flex-col justify-between">
+      <nav className="p-4 flex flex-col gap-2">
+        {links.map((link) => (
+          <NavLink
+            key={link.path}
+            to={link.path}
+            className={({ isActive }) =>
+              `px-4 py-2 rounded-md transition-all ${
+                isActive
+                  ? 'bg-blue-500 text-white font-semibold'
+                  : 'text-gray-700 hover:bg-blue-100'
+              }`
+            }
+          >
+            {link.label}
+          </NavLink>
         ))}
-      </ul>
+      </nav>
+
+      {/* Sidebar Footer */}
+      <div className="p-4 border-t">
+        <div className="text-sm text-gray-600 mb-2">
+          Signed in as <span className="font-medium">{user?.name}</span>
+        </div>
+        <button
+          onClick={logout}
+          className="text-red-600 text-sm hover:underline hover:text-red-800"
+        >
+          Logout
+        </button>
+      </div>
     </aside>
   );
 };

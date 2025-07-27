@@ -2,15 +2,28 @@ import { NavLink } from 'react-router-dom';
 
 const Sidebar = ({ links }) => {
   return (
-    <aside className="w-64 bg-white shadow h-full">
-      <nav className="flex flex-col p-4">
+    <aside
+      style={{
+        width: '16rem', // 64 tailwind units
+        backgroundColor: '#fff',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+        height: '100vh',
+      }}
+    >
+      <nav style={{ display: 'flex', flexDirection: 'column', padding: '1rem' }}>
         {links.map((link) => (
           <NavLink
             key={link.path}
             to={link.path}
-            className={({ isActive }) =>
-              `p-2 rounded hover:bg-blue-100 ${isActive ? 'bg-blue-200 font-bold' : ''}`
-            }
+            style={({ isActive }) => ({
+              padding: '0.5rem',
+              borderRadius: '0.375rem',
+              textDecoration: 'none',
+              color: isActive ? '#1e3a8a' : '#374151',
+              backgroundColor: isActive ? '#bfdbfe' : 'transparent',
+              fontWeight: isActive ? 'bold' : 'normal',
+              marginBottom: '0.25rem',
+            })}
           >
             {link.label}
           </NavLink>
